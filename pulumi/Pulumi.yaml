@@ -1,0 +1,3 @@
+name: do-k8s-challenge
+runtime: go
+description: DigitalOcean Kubernetes Challenge Infra
