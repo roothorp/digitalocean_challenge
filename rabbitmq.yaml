@@ -1,0 +1,14 @@
+apiVersion: rabbitmq.com/v1beta1
+kind: RabbitmqCluster
+metadata:
+  name: roo-test
+spec:
+  image: rabbitmq:3.9.11-management-alpine
+  replicas: 3
+  resources:
+    requests:
+      cpu: 1200m
+      memory: 2000Mi
+    limits:
+      cpu: 1200m
+      memory: 2000Mi
