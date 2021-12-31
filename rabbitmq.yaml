@@ -12,3 +12,73 @@ spec:
     limits:
       cpu: 1200m
       memory: 2000Mi
+--- 
+apiVersion: apps/v1
+kind: Deployment
+metadata: 
+  name: sender
+  labels:
+    app: roo-test
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: nginx
+  template:
+    metadata:
+      labels:
+        app: nginx
+    spec:
+      containers:
+      - name: send
+        image: ghcr.io/roothorp/digitalocean_challenge_send:latest
+        resources:
+          limits:
+            cpu: 500m
+            memory: 200Mi
+        env:
+          - name: RABBITMQ_USERNAME
+            valueFrom:
+              secretKeyRef:
+                name: roo-test-default-user
+                key: username
+          - name: RABBITMQ_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: roo-test-default-user
+                key: password
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata: 
+  name: receiver
+  labels:
+    app: roo-test
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: nginx
+  template:
+    metadata:
+      labels:
+        app: nginx
+    spec:
+      containers:
+      - name: receive
+        image: ghcr.io/roothorp/digitalocean_challenge_receive:latest
+        resources:
+          limits:
+            cpu: 500m
+            memory: 200Mi
+        env:
+          - name: RABBITMQ_USERNAME
+            valueFrom:
+              secretKeyRef:
+                name: roo-test-default-user
+                key: username
+          - name: RABBITMQ_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: roo-test-default-user
+                key: password
