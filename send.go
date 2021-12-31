@@ -3,7 +3,9 @@ package main
 import (
 	"fmt"
 	"log"
+	"math/rand"
 	"os"
+	"strconv"
 
 	"github.com/streadway/amqp"
 )
@@ -52,16 +54,19 @@ func main() {
 	)
 	failOnError(err, "Failed to declare a queue")
 
-	// Create a message.
-	body := "Hello World!"
-	err = ch.Publish(
-		"",     // exchange
-		q.Name, // routing key
-		false,  // mandatory
-		false,  // immediate
-		amqp.Publishing{
-			ContentType: "text/plain",
-			Body:        []byte(body),
-		})
-	failOnError(err, "Failed to publish a message")
+	// Create some messages.
+	for i := 0; i < 10; i++ {
+		body := strconv.Itoa(rand.Intn(1000))
+		err = ch.Publish(
+			"",     // exchange
+			q.Name, // routing key
+			false,  // mandatory
+			false,  // immediate
+			amqp.Publishing{
+				ContentType: "text/plain",
+				Body:        []byte(body),
+			})
+		failOnError(err, "Failed to publish a message")
+		log.Printf("Published Message: %s", body)
+	}
 }

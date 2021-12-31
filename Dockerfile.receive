@@ -8,6 +8,6 @@ RUN go mod download
 
 COPY receive.go ./
 
-RUN go build receive
+RUN go build receive.go
 
-CMD ["/receive"]
+CMD ["./receive"]

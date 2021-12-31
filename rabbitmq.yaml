@@ -6,35 +6,32 @@ spec:
   image: rabbitmq:3.9.11-management-alpine
   replicas: 3
   resources:
-    requests:
-      cpu: 1200m
-      memory: 2000Mi
     limits:
-      cpu: 1200m
-      memory: 2000Mi
---- 
+      cpu: 1000m
+      memory: 1200Mi
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata: 
-  name: sender
+  name: receiver
   labels:
     app: roo-test
 spec:
-  replicas: 3
+  replicas: 1
   selector:
     matchLabels:
-      app: nginx
+      app: receiver
   template:
     metadata:
       labels:
-        app: nginx
+        app: receiver
     spec:
       containers:
-      - name: send
-        image: ghcr.io/roothorp/digitalocean_challenge_send:latest
+      - name: receive
+        image: roothorp/receiver:latest
         resources:
           limits:
-            cpu: 500m
+            cpu: 200m
             memory: 200Mi
         env:
           - name: RABBITMQ_USERNAME
@@ -47,29 +44,28 @@ spec:
               secretKeyRef:
                 name: roo-test-default-user
                 key: password
----
-apiVersion: apps/v1
-kind: Deployment
+--- 
+apiVersion: batch/v1
+kind: Job
 metadata: 
-  name: receiver
+  name: sender
   labels:
     app: roo-test
 spec:
-  replicas: 3
-  selector:
-    matchLabels:
-      app: nginx
+  completions: 10
+  parallelism: 2
   template:
     metadata:
       labels:
-        app: nginx
+        app: sender
     spec:
+      restartPolicy: Never
       containers:
-      - name: receive
-        image: ghcr.io/roothorp/digitalocean_challenge_receive:latest
+      - name: send
+        image: roothorp/sender:0.2
         resources:
           limits:
-            cpu: 500m
+            cpu: 200m
             memory: 200Mi
         env:
           - name: RABBITMQ_USERNAME

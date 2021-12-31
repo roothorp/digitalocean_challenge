@@ -8,6 +8,6 @@ RUN go mod download
 
 COPY send.go ./
 
-RUN go build receive
+RUN go build send.go
 
-CMD ["/send"]
+CMD ["./send"]
